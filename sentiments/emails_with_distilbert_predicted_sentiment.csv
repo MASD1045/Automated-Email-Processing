@@ -1,0 +1,32 @@
+body,sentiment,predicted_sentiment
+I absolutely love the service! Everything is amazing.,positive,positive
+I'm extremely satisfied with my purchase. Will buy again.,positive,positive
+Fantastic customer support! They were very helpful and friendly.,positive,positive
+Highly recommend this product. It works like a charm!,positive,positive
+I’m so pleased with my experience. Everything went smoothly.,positive,positive
+What a great purchase! It was exactly what I needed.,positive,positive
+Wonderful product! I’m so glad I bought it.,positive,positive
+This is by far the best experience I’ve had with any company.,positive,positive
+I can’t believe how easy it was to make a purchase. Very happy.,positive,positive
+The quality of the product is excellent. It’s exactly what I wanted.,positive,positive
+Totally impressed with the customer service. Very responsive!,positive,positive
+I’ll definitely be coming back to this store in the future.,positive,positive
+I love how efficient the service was. Thank you for making this so easy.,positive,positive
+The support team was outstanding in helping me resolve an issue.,positive,positive
+I’m very disappointed with the product. It didn’t work as expected.,negative,negative
+The customer support was terrible. I will not recommend this.,negative,negative
+The service was awful. It took too long and wasn’t worth it.,negative,negative
+I regret buying this. It broke after a week.,negative,negative
+Terrible quality. Not at all like the description on the website.,negative,negative
+This product was a waste of money. It’s defective.,negative,negative
+I’m not happy with my purchase at all. Will return it.,negative,negative
+Very dissatisfied with the product. It didn’t meet my expectations.,negative,negative
+I can’t believe how bad the customer service was. I will never use this company again.,negative,negative
+I’ve had issues since I got this. Definitely won’t buy again.,negative,negative
+The order was wrong and no one is responding to my messages.,negative,negative
+I waited for weeks for this and it’s totally not what I wanted.,negative,negative
+The product broke after only a few uses. So frustrating!,negative,negative
+Very unhappy with my experience. I’ll be looking elsewhere next time.,negative,negative
+I wouldn’t recommend this to anyone. Terrible experience.,negative,negative
+I’m extremely disappointed. The item did not perform as advertised.,negative,negative
+This is by far the worst purchase I’ve made.,negative,negative

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fetched Emails</title>
+</head>
+<body>
+    <h1>Fetched Emails</h1>
+    <ul>
+        {% for email in emails %}
+            <li><strong>{{ email.subject }}</strong>: {{ email.body[:300] }}...</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('summarize') }}">Summarize Emails</a>
+</body>
+</html>

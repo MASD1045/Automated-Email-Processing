@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Categories</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    input, button { padding: 0.5em; margin: 0.5em 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; }
+    .category-actions button { margin-left: 0.5em; }
+  </style>
+</head>
+<body>
+
+  <h2>Manage Categories</h2>
+
+  <!-- Add Category Input -->
+  <label for="new-category">New Category:</label>
+  <input type="text" id="new-category" placeholder="e.g., Finance, Updates" />
+  <button onclick="addCategory()">Add</button>
+
+  <!-- Category Table -->
+  <table id="category-table">
+    <thead>
+      <tr>
+        <th>Category Name</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="category-body">
+      <tr>
+        <td>Work</td>
+        <td class="category-actions"><button onclick="deleteCategory(this)">Delete</button></td>
+      </tr>
+      <tr>
+        <td>Personal</td>
+        <td class="category-actions"><button onclick="deleteCategory(this)">Delete</button></td>
+      </tr>
+      <tr>
+        <td>Spam</td>
+        <td class="category-actions"><button onclick="deleteCategory(this)">Delete</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+    function addCategory() {
+      const input = document.getElementById("new-category");
+      const category = input.value.trim();
+
+      if (!category) {
+        alert("Category name cannot be empty.");
+        return;
+      }
+
+      const existing = Array.from(document.querySelectorAll("#category-body tr td:first-child"))
+                            .map(td => td.textContent.toLowerCase());
+
+      if (existing.includes(category.toLowerCase())) {
+        alert("This category already exists.");
+        return;
+      }
+
+      const tbody = document.getElementById("category-body");
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${category}</td>
+        <td class="category-actions"><button onclick="deleteCategory(this)">Delete</button></td>
+      `;
+
+      tbody.appendChild(row);
+      input.value = "";
+    }
+
+    function deleteCategory(button) {
+      const row = button.closest("tr");
+      row.remove();
+    }
+  </script>
+
+</body>
+</html>

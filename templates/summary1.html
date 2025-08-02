@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Summary</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; }
+        .email-container { border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; }
+        .subject { font-weight: bold; }
+        .btn { padding: 5px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+        .btn:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <h2>Email Summary</h2>
+
+    <div class="email-container">
+        <p><strong>Original:</strong> {{ email.body }}</p>
+        <p><strong>Summary:</strong> {{ summary }}</p>
+    </div>
+    
+    <a href="{{ url_for('index') }}" class="btn">Back to Emails</a>
+
+</body>
+</html>

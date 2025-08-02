@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Sentiments</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .category {
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .toggle-btn {
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .email-list {
+            display: none;
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .email-item {
+            background-color: #fff;
+            margin-bottom: 8px;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Email Sentiments</h1>
+
+    {% for row in grouped.itertuples() %}
+        <div class="category">
+            <div class="toggle-btn" onclick="toggleEmails('{{ loop.index0 }}')">
+                ▶ {{ row.predicted_sentiment }}
+            </div>
+            <div class="email-list" id="emails-{{ loop.index0 }}">
+                {% for email in row.body %}
+                    <div class="email-item">{{ email }}</div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+    <script>
+        function toggleEmails(index) {
+            const emailList = document.getElementById("emails-" + index);
+            const toggleBtn = emailList.previousElementSibling;
+            if (emailList.style.display === "block") {
+                emailList.style.display = "none";
+                toggleBtn.innerHTML = toggleBtn.innerHTML.replace("▼", "▶");
+            } else {
+                emailList.style.display = "block";
+                toggleBtn.innerHTML = toggleBtn.innerHTML.replace("▶", "▼");
+            }
+        }
+    </script>
+
+</body>
+</html>
