@@ -2,72 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Email Categories</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .category {
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 10px;
-            background-color: #f9f9f9;
-        }
-        .toggle-btn {
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-            color: #007bff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .email-list {
-            display: none;
-            margin-top: 10px;
-            padding-left: 20px;
-        }
-        .email-item {
-            background-color: #fff;
-            margin-bottom: 8px;
-            padding: 10px;
-            border-left: 4px solid #007bff;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Email Categorization</title>
 </head>
 <body>
 
-    <h1>Email Categories</h1>
+<nav class="navbar">
+    <a href="/emails">Summarization</a>
+    <a href="/categorize">Categorization</a>
+    <a href="/sentiment">Sentiment</a>
+</nav>
 
-    {% for row in grouped.itertuples() %}
-        <div class="category">
-            <div class="toggle-btn" onclick="toggleEmails('{{ loop.index0 }}')">
-                ▶ {{ row.Predicted_Category }}
-            </div>
-            <div class="email-list" id="emails-{{ loop.index0 }}">
-                {% for email in row.body %}
-                    <div class="email-item">{{ email }}</div>
-                {% endfor %}
-            </div>
-        </div>
-    {% endfor %}
+<div class="container">
+    <h1>Email Categorization</h1>
 
-    <script>
-        function toggleEmails(index) {
-            const emailList = document.getElementById("emails-" + index);
-            const toggleBtn = emailList.previousElementSibling;
-            if (emailList.style.display === "block") {
-                emailList.style.display = "none";
-                toggleBtn.innerHTML = toggleBtn.innerHTML.replace("▼", "▶");
-            } else {
-                emailList.style.display = "block";
-                toggleBtn.innerHTML = toggleBtn.innerHTML.replace("▶", "▼");
-            }
-        }
-    </script>
+    <!-- ===============================
+         STEP 1: CATEGORY INPUT
+    =============================== -->
+    {% if not ask_examples %}
+    <form method="POST">
+        <label><strong>Enter categories (comma separated):</strong></label><br><br>
+        <input type="text" name="categories" placeholder="Promotions, Updates, Exams" required>
+        <br><br>
+        <button type="submit">Continue</button>
+    </form>
+    {% endif %}
+
+    <!-- ===============================
+         STEP 2: UNKNOWN CATEGORY EXAMPLES
+    =============================== -->
+    {% if ask_examples %}
+    <form method="POST">
+        <input type="hidden" name="categories" value="{{ categories }}">
+
+        <h3>Provide examples for unknown categories</h3>
+
+        {% for cat in unknown_categories %}
+            <label><strong>{{ cat }}</strong></label><br>
+            <textarea
+                name="examples_{{ cat }}"
+                rows="3"
+                placeholder="Enter sample emails separated by ||"
+                required></textarea>
+            <br><br>
+        {% endfor %}
+
+        <button type="submit">Categorize Emails</button>
+    </form>
+    {% endif %}
+
+    <!-- ===============================
+         RESULTS
+    =============================== -->
+    {% if results %}
+        <h2>Predicted Categories</h2>
+
+        {% for email in results %}
+            <div class="email-card">
+                <h3>{{ email.Subject or "No Subject" }}</h3>
+                <p><strong>Category:</strong> {{ email.Predicted_Category }}</p>
+                <p><strong>Score:</strong> {{ email.Category_Score }}</p>
+                <p>{{ email.Body }}</p>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+</div>
 
 </body>
 </html>

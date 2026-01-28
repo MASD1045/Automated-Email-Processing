@@ -1,15 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Fetched Emails</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Your Emails</title>
 </head>
 <body>
+
+<nav class="navbar">
+    <a href="/emails">Summarization</a>
+    <a href="/categorize">Categorization</a>
+    <a href="/sentiment">Sentiment</a>
+</nav>
+
+<div class="container">
     <h1>Fetched Emails</h1>
-    <ul>
-        {% for email in emails %}
-            <li><strong>{{ email.subject }}</strong>: {{ email.body[:300] }}...</li>
-        {% endfor %}
-    </ul>
-    <a href="{{ url_for('summarize') }}">Summarize Emails</a>
+
+    {% for email in emails %}
+        {% if email.Body and email.Body|length > 0 %}
+            <div class="email-card">
+                <h3>{{ email.Subject or "No Subject" }}</h3>
+
+                <p class="email-body">
+                    {{ email.Body }}
+                </p>
+
+                {% if email.Summary %}
+                    <div class="summary-box">
+                        <strong>Summary:</strong>
+                        <p>{{ email.Summary }}</p>
+                    </div>
+                {% endif %}
+
+                <form method="POST" action="/summarize_email">
+                    <input type="hidden" name="email_id" value="{{ email.ID }}">
+                    <button type="submit">Summarize</button>
+                </form>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
 </body>
 </html>

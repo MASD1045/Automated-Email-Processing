@@ -1,41 +1,90 @@
-import pandas as pd
-import json
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
+# categorization.py
 from sentence_transformers import SentenceTransformer
-import joblib
+import numpy as np
 
-# Load your emails from JSON
-def load_emails(path="emails.csv"):
-    with open(path, 'r') as f:
-        data = [json.loads(line) for line in f]
-    return pd.DataFrame(data)
+# ===============================
+# LOAD MODEL (ONCE)
+# ===============================
+EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2"
+embedder = SentenceTransformer(EMBEDDING_MODEL)
 
-# Prepare data
-df = load_emails()
-df = df[df['label'].isin(['Work', 'Personal', 'Spam'])]  # Example categories
-df['text'] = df['subject'] + ' ' + df['body']
+BASE_THRESHOLD = 0.35
+UNCAT = "UNCATEGORIZED"
 
-# Encode using BERT
-model = SentenceTransformer('all-MiniLM-L6-v2')  # Fast & good
-X = model.encode(df['text'].tolist(), show_progress_bar=True)
 
-# Encode labels
-label_map = {label: i for i, label in enumerate(df['label'].unique())}
-y = df['label'].map(label_map)
+# ===============================
+# COSINE SIMILARITY
+# ===============================
+def cosine_sim(a, b):
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-8))
 
-# Train/test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Classifier
-clf = LogisticRegression(max_iter=1000)
-clf.fit(X_train, y_train)
+# ===============================
+# MAIN CATEGORIZATION FUNCTION
+# ===============================
+def categorize_emails(
+    emails,
+    label_centroids,
+    user_categories,
+    user_examples=None
+):
+    """
+    emails: list of dicts (each with 'Body')
+    label_centroids: frozen Gmail centroids
+    user_categories: list of category names (strings)
+    user_examples: dict {category: [example texts]}
+    """
 
-# Evaluate
-y_pred = clf.predict(X_test)
-print(classification_report(y_test, y_pred, target_names=label_map.keys()))
+    known = [c for c in user_categories if c in label_centroids]
+    unknown = [c for c in user_categories if c not in label_centroids]
 
-# Save model
-joblib.dump(clf, 'model/logistic_model.pkl')
-joblib.dump(label_map, 'model/label_map.pkl')
+    # -----------------------------
+    # Build active centroids
+    # -----------------------------
+    active_centroids = {}
+
+    # Known categories
+    for c in known:
+        active_centroids[c] = label_centroids[c]
+
+    # Unknown categories → build from examples
+    if user_examples:
+        for cat, examples in user_examples.items():
+            emb = embedder.encode(
+                examples,
+                normalize_embeddings=True,
+                show_progress_bar=False
+            )
+            active_centroids[cat] = emb.mean(axis=0)
+
+    # -----------------------------
+    # Predict
+    # -----------------------------
+    results = []
+
+    for email in emails:
+        text = email.get("Body", "")
+        if not text.strip():
+            email["Predicted_Category"] = UNCAT
+            continue
+
+        emb = embedder.encode(text, normalize_embeddings=True)
+
+        best_label = UNCAT
+        best_score = -1.0
+
+        for lbl, centroid in active_centroids.items():
+            score = cosine_sim(emb, centroid)
+            if score > best_score:
+                best_score = score
+                best_label = lbl
+
+        if best_score < BASE_THRESHOLD:
+            best_label = UNCAT
+
+        email["Predicted_Category"] = best_label
+        email["Category_Score"] = round(best_score, 3)
+
+        results.append(email)
+
+    return results, unknown

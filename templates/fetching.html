@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fetching Emails</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; text-align: center; padding: 50px; }
+        #progress-bar {
+            width: 80%;
+            height: 30px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 30px auto;
+            overflow: hidden;
+            background: #fff;
+        }
+        #progress-fill {
+            height: 100%;
+            width: 0;
+            background: #4CAF50;
+            transition: width 0.5s;
+        }
+        #status-text { font-size: 18px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Fetching Emails...</h1>
+    <div id="progress-bar">
+        <div id="progress-fill"></div>
+    </div>
+    <div id="status-text">Starting...</div>
+
+    <script>
+    function updateProgress() {
+        fetch('/status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'fetching') {
+                    const total = data.total || 1;
+                    const fetched = data.fetched || 0;
+                    const percent = Math.floor((fetched / total) * 100);
+
+                    document.getElementById('progress-fill').style.width = percent + '%';
+                    document.getElementById('status-text').innerText =
+                        `Fetching emails… approximately ${Math.max(1, Math.ceil((total - fetched) / 5))} second(s) remaining`;
+
+                    setTimeout(updateProgress, 1000);
+
+                } else if (data.status === 'done') {
+                    document.getElementById('progress-fill').style.width = '100%';
+                    document.getElementById('status-text').innerText =
+                        'Emails fetched successfully! Redirecting…';
+                        
+                    setTimeout(() => {
+                        window.location.href = "/emails";
+                    }, 1500);
+
+                } else if (data.status === 'error') {
+                    document.getElementById('status-text').innerText =
+                        'An error occurred while fetching emails.';
+                } else {
+                    setTimeout(updateProgress, 1000);
+                }
+            })
+            .catch(() => {
+                document.getElementById('status-text').innerText =
+                    'Error connecting to server.';
+            });
+    }
+
+    updateProgress();
+</script>
+</body>
+</html>
